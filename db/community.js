@@ -9,7 +9,7 @@ const community = [
         description : "All things ! no boundaries here, post what you want to post",
         founder : {id : users[0]._id, username : users[0].username},
         posts : [],
-        members : [],
+        members : [{id : users[0]._id, username : users[0].username}],
     }
 ];
 
