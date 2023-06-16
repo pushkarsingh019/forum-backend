@@ -10,7 +10,6 @@ const posts = [
             username : users[0].username,
         },
         community : {},
-        title : "the first post",
         post : "this is the first dummy post and also the beginning to something amazing",
         upvotes : [{id : users[0]._id, username : users[0].username}],
         downvotes : [],

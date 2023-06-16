@@ -5,7 +5,10 @@ import { v4 as uuid } from "uuid";
 
 import { initialiseSchema } from "./initial.js";
 import users from "./db/users.js";
+import posts from "./db/posts.js";
+import communitySchema from "./db/community.js";
 import { access_key } from "./utils/config.js";
+import authenticateToken from "./utils/authenticateToken.js";
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -63,6 +66,41 @@ app.post(`/api/signup`, (req, res) => {
         res.status(200).json({user : newUser, accessToken, message : "account created"})
     }
 
+});
+
+// post routes
+app.route('/api/post')
+.get((req, res) => {
+    res.status(200).send(posts);
+})
+.post(authenticateToken, (req, res) => {
+    const {post, community} = req.body;
+    const requestedUser = req.user;
+    const user = users.find(user => user._id === requestedUser._id);
+    if(user){
+        const newPost = {
+            _id : uuid(),
+            authorDetails : {
+                id : user._id,
+                username : user.username 
+            },
+            community : {
+                id : communitySchema[0]._id,
+                communityName : communitySchema[0].username
+            },
+            post,
+            upvotes : [{id : user._id, username : user.username}],
+            downvotes : [],
+            likes : [],
+            comments : [],
+            time : new Date(),
+        };
+        posts.push(newPost)
+        res.status(200).send(posts);
+    }
+    else{
+        res.status(401).send("user not part of the database.")
+    }
 })
 
 app.listen(PORT, () => {
