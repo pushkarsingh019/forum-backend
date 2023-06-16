@@ -11,7 +11,7 @@ export const initialiseSchema = () => {
 
     community[0] = {...community[0], posts : posts.filter(post => post.community.id === community[0]._id)};
 
-    console.log(users);
+    console.log(users[0]);
     console.log(posts);
     console.log(community);
 };
