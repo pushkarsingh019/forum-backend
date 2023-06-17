@@ -9,6 +9,7 @@ import posts from "./db/posts.js";
 import communitySchema from "./db/community.js";
 import { access_key } from "./utils/config.js";
 import authenticateToken from "./utils/authenticateToken.js";
+import e from "express";
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -68,7 +69,7 @@ app.post(`/api/signup`, (req, res) => {
 
 });
 
-// post routes
+// CRUD POST ROUTES
 app.route('/api/post')
 .get((req, res) => {
     res.status(200).send(posts);
@@ -101,7 +102,39 @@ app.route('/api/post')
     else{
         res.status(401).send("user not part of the database.")
     }
-})
+});
+
+// Post Interaction Routes
+app.get(`/api/post/like/:postId`, authenticateToken, (req, res) => {
+    const user = req.user;
+    const {postId} = req.params;
+    const postToLike = posts.find(post => post._id === postId);
+    if(postToLike.likes.filter(like => like.id === user._id).length > 0){
+        postToLike.likes = postToLike.likes.filter(like => like.id !== user._id);
+        res.status(200).send(posts)
+    }
+    else{
+        postToLike.likes.push({id : user._id, username : user.username});
+        res.status(200).send(posts);
+    }
+});
+
+app.get(`/api/post/bookmark/:postId`, authenticateToken, (req, res) => {
+    const {postId} = req.params;
+    const requestedUser = req.user;
+    const postToBookmark = posts.find(post => post._id === postId);
+    const user = users.find(user => user._id === requestedUser._id);
+    user.bookmarks.push(postToBookmark);
+    res.status(200).send(user);
+});
+
+app.delete(`/api/post/bookmark/:postId`, authenticateToken, (req, res) => {
+    const {postId} = req.params;
+    const requestedUser = req.user;
+    const user = users.find(user => user._id === requestedUser._id);
+    user.bookmarks = user.bookmarks.filter(post => post._id !== postId);
+    res.status(200).send(user);
+});
 
 app.listen(PORT, () => {
     initialiseSchema();
