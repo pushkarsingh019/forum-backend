@@ -104,6 +104,17 @@ app.route('/api/post')
     }
 });
 
+app.get('/api/post/:id', (req, res) => {
+    const {id} = req.params;
+    const postToSend = posts.find(post => post._id === id);
+    if (postToSend !== undefined) {
+        res.status(200).send(postToSend);
+    }
+    else{
+        res.status(404).send('post not found');
+    }
+})
+
 // Post Interaction Routes
 app.get(`/api/post/like/:postId`, authenticateToken, (req, res) => {
     const user = req.user;
