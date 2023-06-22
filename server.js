@@ -9,7 +9,7 @@ import posts from "./db/posts.js";
 import communitySchema from "./db/community.js";
 import { access_key } from "./utils/config.js";
 import authenticateToken from "./utils/authenticateToken.js";
-import getUser from "./utils/getUser.js";
+import {getUser, getUserByUsername} from "./utils/getUser.js";
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -176,6 +176,18 @@ app.route(`/api/user/:userId`)
     }
     const userObject = getUser(requestedUser._id);
     res.status(200).send(userObject)
+})
+
+app.get(`/api/profile/:username`, (req, res) => {
+    const {username} = req.params;
+    const userToSend = users.find(user => user.username === username);
+    if(userToSend !== undefined){
+        const userObject = getUserByUsername(username);
+        res.status(200).send(userObject);
+    }
+    else{
+        res.status(404).send("user not found");
+    }
 })
 
 app.listen(PORT, () => {
