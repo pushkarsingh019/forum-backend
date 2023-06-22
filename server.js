@@ -45,7 +45,7 @@ app.post(`/api/login`, (req, res) => {
 });
 
 app.post(`/api/signup`, (req, res) => {
-    const {username, email, password} = req.body;
+    const {name, username, email, password} = req.body;
     const userExists = users.find(user => user.email === email);
     if(userExists){
         res.status(409).json({message : "user already exists, log in..."});
@@ -53,6 +53,7 @@ app.post(`/api/signup`, (req, res) => {
     else {
         const newUser = {
             _id : uuid(),
+            name,
             email,
             password,
             username,
