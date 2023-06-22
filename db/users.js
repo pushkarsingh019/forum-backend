@@ -1,9 +1,10 @@
 import { v4 as uuid } from "uuid";
 
 
-const users = [
+let users = [
     {
         _id : uuid(),
+        name : "Gavin Belson",
         email : "gavin@hooli.com",
         password : "killpiedpiper",
         username : "gavin",

@@ -9,7 +9,7 @@ import posts from "./db/posts.js";
 import communitySchema from "./db/community.js";
 import { access_key } from "./utils/config.js";
 import authenticateToken from "./utils/authenticateToken.js";
-import e from "express";
+import getUser from "./utils/getUser.js";
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -32,7 +32,8 @@ app.post(`/api/login`, (req, res) => {
         const user = users.find(user => user.email === email);
         if(user.password === password){
             const accessToken = jwt.sign(user, access_key);
-            res.status(200).json({user : user, accessToken : accessToken, message : "login sucessfull"});
+            const userObject = getUser(user._id);
+            res.status(200).json({user : userObject, accessToken : accessToken, message : "login sucessfull"});
         }
         else {
             res.status(401).json({message : `wrong password for @${user.username}`});
@@ -63,8 +64,9 @@ app.post(`/api/signup`, (req, res) => {
             followers : [],
         };
         users.push(newUser);
+        const userObject = getUser(newUser._id);
         const accessToken = jwt.sign(newUser, access_key);
-        res.status(200).json({user : newUser, accessToken, message : "account created"})
+        res.status(200).json({user : userObject, accessToken, message : "account created"})
     }
 
 });
@@ -113,7 +115,7 @@ app.get('/api/post/:id', (req, res) => {
     else{
         res.status(404).send('post not found');
     }
-})
+});
 
 // Post Interaction Routes
 app.get(`/api/post/like/:postId`, authenticateToken, (req, res) => {
@@ -136,8 +138,10 @@ app.get(`/api/post/bookmark/:postId`, authenticateToken, (req, res) => {
     const postToBookmark = posts.find(post => post._id === postId);
     const user = users.find(user => user._id === requestedUser._id);
     user.bookmarks.push(postToBookmark);
-    res.status(200).send(user);
+    const userObject = getUser(user._id);
+    res.status(200).send(userObject);
 });
+
 
 app.delete(`/api/post/bookmark/:postId`, authenticateToken, (req, res) => {
     const {postId} = req.params;
@@ -146,6 +150,32 @@ app.delete(`/api/post/bookmark/:postId`, authenticateToken, (req, res) => {
     user.bookmarks = user.bookmarks.filter(post => post._id !== postId);
     res.status(200).send(user);
 });
+
+// user routes
+app.route(`/api/user/:userId`)
+.get((req, res) => {
+    const {userId} = req.params;
+    const userToSend = users.find(user => user._id === userId);
+    if(userToSend !== undefined){
+        const userObject = getUser(userToSend._id);
+        res.status(200).send(userObject);
+    }
+    else{
+        res.status(404).json({message : "incorrect user"})
+    }
+})
+.put(authenticateToken, (req, res) => {
+    const requestedUser = req.user;
+    const {name, username, bio} = req.body;
+    const userIndex = users.findIndex(user => user._id === requestedUser._id);
+    if(userIndex !== -1){
+        users[userIndex].name = name;
+        users[userIndex].bio = bio;
+        users[userIndex].username = username;
+    }
+    const userObject = getUser(requestedUser._id);
+    res.status(200).send(userObject)
+})
 
 app.listen(PORT, () => {
     initialiseSchema();
