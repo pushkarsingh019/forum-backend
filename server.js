@@ -188,7 +188,47 @@ app.get(`/api/profile/:username`, (req, res) => {
     else{
         res.status(404).send("user not found");
     }
+});
+
+// follow and unfollow user routes
+app.get('/api/user/follow/:userId', authenticateToken, (req, res) => {
+    //TODO : add a function if the user does not already follow the person.
+    const requestedUser = req.user;
+    const {userId} = req.params
+    const userToFollow = users.findIndex(user => user._id === userId);
+    const userWhoFollowed = users.findIndex(user => user._id === requestedUser._id);
+    if(userToFollow !== -1){
+        users[userToFollow].followers.push({
+            _id : requestedUser._id,
+            username : requestedUser.username
+        });
+    }
+    if(userWhoFollowed !== -1){
+        users[userWhoFollowed].follows.push({
+            _id : users[userToFollow]._id,
+            username : users[userToFollow].username
+        })
+    };
+    const userObject = getUser(requestedUser._id);
+    res.status(200).send(userObject);
+});
+
+app.delete('/api/user/follow/:userId', authenticateToken, (req, res) => {
+    const requestedUser = req.user;
+    const {userId} = req.params
+    const userToUnfollow = users.findIndex(user => user._id === userId);
+    const userWhoUnfollowed = users.findIndex(user => user._id === requestedUser._id);
+    if(userToUnfollow !== -1){
+       users[userToUnfollow].followers = users[userToUnfollow].followers.filter(follower => follower._id !== requestedUser._id);
+    }
+    if(userWhoUnfollowed !== -1){
+        users[userWhoUnfollowed].follows = users[userWhoUnfollowed].follows.filter(follows => follows._id !== userId);
+    };
+    console.log(users);
+    const userObject = getUser(requestedUser._id);
+    res.status(200).send(userObject);
 })
+
 
 app.listen(PORT, () => {
     initialiseSchema();
