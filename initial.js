@@ -1,5 +1,5 @@
 import users from "./db/users.js";
-import posts from "./db/posts.js";
+import {posts} from "./db/posts.js";
 import community from "./db/community.js";
 
 // to solve for circular dependency, I am adding dependency parts of schema here

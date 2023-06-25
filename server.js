@@ -5,7 +5,7 @@ import { v4 as uuid } from "uuid";
 
 import { initialiseSchema } from "./initial.js";
 import users from "./db/users.js";
-import posts from "./db/posts.js";
+import {posts} from "./db/posts.js";
 import communitySchema from "./db/community.js";
 import { access_key } from "./utils/config.js";
 import authenticateToken from "./utils/authenticateToken.js";
@@ -107,7 +107,8 @@ app.route('/api/post')
     }
 });
 
-app.get('/api/post/:id', (req, res) => {
+app.route('/api/post/:id')
+.get((req, res) => {
     const {id} = req.params;
     const postToSend = posts.find(post => post._id === id);
     if (postToSend !== undefined) {
@@ -116,7 +117,40 @@ app.get('/api/post/:id', (req, res) => {
     else{
         res.status(404).send('post not found');
     }
-});
+})
+.delete(authenticateToken, (req, res) => {
+    const {id} = req.params;
+    const user = req.user;
+    const postToDelete = posts.find(post => post._id === id);
+    if(user._id === postToDelete.authorDetails.id){
+        // delete the post
+        const deleteIndex = posts.findIndex(post => post._id === id);
+        posts.splice(deleteIndex, 1);
+        res.status(200).send(posts);
+    }
+    else{
+        res.status(401).send("you are not authorised to delete this post");
+    }
+})
+.put(authenticateToken, (req, res) => {
+    const {post} = req.body;
+    const {id} = req.params;
+    const user = req.user;
+    const postToEditIndex = posts.findIndex(post => post._id === id);
+    if(postToEditIndex !== -1){
+        if(posts[postToEditIndex].authorDetails.id === user._id){
+            posts[postToEditIndex].post = post;
+            posts[postToEditIndex].time = new Date();
+            res.status(200).send(posts[postToEditIndex]);
+        }
+        else{
+            res.status(401).send("you are not authorised to edit this post");
+        }
+    }
+    else{
+        res.status(404).send("post not found");
+    }
+})
 
 // Post Interaction Routes
 app.get(`/api/post/like/:postId`, authenticateToken, (req, res) => {
@@ -224,7 +258,6 @@ app.delete('/api/user/follow/:userId', authenticateToken, (req, res) => {
     if(userWhoUnfollowed !== -1){
         users[userWhoUnfollowed].follows = users[userWhoUnfollowed].follows.filter(follows => follows._id !== userId);
     };
-    console.log(users);
     const userObject = getUser(requestedUser._id);
     res.status(200).send(userObject);
 })

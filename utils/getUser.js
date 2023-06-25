@@ -1,5 +1,5 @@
 import users from "../db/users.js"
-import posts from "../db/posts.js";
+import {posts} from "../db/posts.js";
 
 export const getUser = (userId) => {
     const userToSend = users.find(user => user._id === userId);

@@ -2,7 +2,7 @@ import { v4 as uuid } from "uuid";
 import users from "./users.js";
 import community from "./community.js";
 
-const posts = [
+export let posts = [
     {
         _id : uuid(),
         authorDetails : {
@@ -17,4 +17,4 @@ const posts = [
     },
 ];
 
-export default posts;
+// export default posts;
