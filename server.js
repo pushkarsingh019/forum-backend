@@ -10,6 +10,7 @@ import communitySchema from "./db/community.js";
 import { access_key } from "./utils/config.js";
 import authenticateToken from "./utils/authenticateToken.js";
 import {getUser, getUserByUsername} from "./utils/getUser.js";
+import createFeed from "./utils/createFeed.js";
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -22,6 +23,13 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.send("Api's are up and running");
 });
+
+// User specialised feed
+app.get('/api/feed', authenticateToken, (req, res) => {
+    const user = req.user;
+    const userFeed = createFeed(user._id);
+    res.status(200).send(userFeed);
+})
 
 
 // authenentication routes
