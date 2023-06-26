@@ -260,6 +260,30 @@ app.delete('/api/user/follow/:userId', authenticateToken, (req, res) => {
     };
     const userObject = getUser(requestedUser._id);
     res.status(200).send(userObject);
+});
+
+
+// comments crud routes
+app.route('/api/post/comment')
+.post(authenticateToken, (req, res) => {
+    const {comment, postId} = req.body;
+    const user = req.user;
+    const postToComment = posts.find(post => post._id === postId);
+    const newComment = {
+        _id : uuid(),
+        comment : comment,
+        authorDetails : {
+            id : user._id,
+            username : user.username
+        }
+    };
+    if(postToComment !== undefined){
+        postToComment.comments.push(newComment);
+        res.status(200).send(postToComment);
+    }
+    else{
+        res.status(404).send("no such post found")
+    }
 })
 
 

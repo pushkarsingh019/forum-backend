@@ -16,5 +16,3 @@ export let posts = [
         time : new Date()
     },
 ];
-
-// export default posts;
