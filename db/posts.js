@@ -8,6 +8,7 @@ export let posts = [
         authorDetails : {
             id : users[0]._id,
             username : users[0].username,
+            name : users[0].name
         },
         community : {},
         post : "this is the first dummy post and also the beginning to something amazing",

@@ -86,7 +86,8 @@ app.route('/api/post')
             _id : uuid(),
             authorDetails : {
                 id : user._id,
-                username : user.username 
+                username : user.username ,
+                name : user.name
             },
             community : {
                 id : communitySchema[0]._id,
