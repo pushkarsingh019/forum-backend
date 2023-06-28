@@ -66,6 +66,7 @@ app.post(`/api/signup`, (req, res) => {
             password,
             username,
             bio : "",
+            portfolioLink : "",
             posts : [],
             communities : [],
             bookmarks : [],
@@ -210,12 +211,13 @@ app.route(`/api/user/:userId`)
 })
 .put(authenticateToken, (req, res) => {
     const requestedUser = req.user;
-    const {name, username, bio} = req.body;
+    const {name, username, bio, portfolioLink} = req.body;
     const userIndex = users.findIndex(user => user._id === requestedUser._id);
     if(userIndex !== -1){
         users[userIndex].name = name;
         users[userIndex].bio = bio;
         users[userIndex].username = username;
+        users[userIndex].portfolioLink = portfolioLink;
     }
     const userObject = getUser(requestedUser._id);
     res.status(200).send(userObject)
