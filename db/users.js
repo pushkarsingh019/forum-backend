@@ -5,6 +5,7 @@ let users = [
     {
         _id : uuid(),
         name : "Gavin Belson",
+        avatar : "",
         email : "gavin@hooli.com",
         password : "killpiedpiper",
         username : "gavin",

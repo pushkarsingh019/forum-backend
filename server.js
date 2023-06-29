@@ -11,6 +11,9 @@ import { access_key } from "./utils/config.js";
 import authenticateToken from "./utils/authenticateToken.js";
 import {getUser, getUserByUsername} from "./utils/getUser.js";
 import createFeed from "./utils/createFeed.js";
+import { upload } from "./utils/imageUpload.js";
+import { uploadImage } from "./utils/cloudinary.js";
+import { deleteImage } from "./utils/deleteImage.js";
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -62,6 +65,7 @@ app.post(`/api/signup`, (req, res) => {
         const newUser = {
             _id : uuid(),
             name,
+            avatar : "",
             email,
             password,
             username,
@@ -294,6 +298,22 @@ app.route('/api/post/comment')
     }
     else{
         res.status(404).send("no such post found")
+    }
+});
+
+// image upload route
+app.post('/api/upload', authenticateToken , upload.single('image'), async (req, res) => {
+    const requestedUser = req.user;
+    const userToUpdate = users.findIndex(user => user._id === requestedUser._id);
+    if(userToUpdate !== -1){
+        const url = await uploadImage(`./uploads/${req.file.originalname}`);
+        users[userToUpdate].avatar = url;
+        const userObject = getUser(requestedUser._id);
+        res.status(200).send(userObject);
+        deleteImage(req.file.originalname);
+    }
+    else{
+        res.status(404).send("user not found");
     }
 })
 
