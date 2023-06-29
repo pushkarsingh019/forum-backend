@@ -65,7 +65,7 @@ app.post(`/api/signup`, (req, res) => {
         const newUser = {
             _id : uuid(),
             name,
-            avatar : "",
+            avatar : "https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
             email,
             password,
             username,
@@ -100,7 +100,8 @@ app.route('/api/post')
             authorDetails : {
                 id : user._id,
                 username : user.username ,
-                name : user.name
+                name : user.name,
+                image : user.avatar,
             },
             community : {
                 id : communitySchema[0]._id,
