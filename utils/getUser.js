@@ -7,6 +7,7 @@ export const getUser = (userId) => {
         const userObject = {
             _id : userToSend._id,
             email : userToSend.email,
+            avatar : userToSend.avatar,
             username : userToSend.username,
             name : userToSend.name,
             bio : userToSend.bio,
@@ -30,6 +31,7 @@ export const getUserByUsername = (username) => {
         const userObject = {
             _id : userToSend._id,
             email : userToSend.email,
+            avatar : userToSend.avatar,
             username : userToSend.username,
             name : userToSend.name,
             bio : userToSend.bio,
