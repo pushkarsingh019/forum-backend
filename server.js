@@ -65,7 +65,7 @@ app.post(`/api/signup`, (req, res) => {
         const newUser = {
             _id : uuid(),
             name,
-            avatar : "https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+            avatar : "https://images.unsplash.com/photo-1580518324671-c2f0833a3af3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
             email,
             password,
             username,
@@ -304,17 +304,22 @@ app.route('/api/post/comment')
 
 // image upload route
 app.post('/api/upload', authenticateToken , upload.single('image'), async (req, res) => {
-    const requestedUser = req.user;
-    const userToUpdate = users.findIndex(user => user._id === requestedUser._id);
-    if(userToUpdate !== -1){
-        const url = await uploadImage(`./uploads/${req.file.originalname}`);
-        users[userToUpdate].avatar = url;
-        const userObject = getUser(requestedUser._id);
-        res.status(200).send(userObject);
-        deleteImage(req.file.originalname);
+    if(!req.file){
+        res.status(404).send("no image uploaded");
     }
     else{
-        res.status(404).send("user not found");
+        const requestedUser = req.user;
+        const userToUpdate = users.findIndex(user => user._id === requestedUser._id);
+        if(userToUpdate !== -1){
+            const url = await uploadImage(`./uploads/${req.file.originalname}`);
+            users[userToUpdate].avatar = url;
+            const userObject = getUser(requestedUser._id);
+            res.status(200).send(userObject);
+            deleteImage(req.file.originalname);
+        }
+        else{
+            res.status(404).send("user not found");
+        }
     }
 })
 
